@@ -21,12 +21,14 @@ class Doctor(User):
                  name,
                  address,
                  specialities,
-                 schedule):
+                 schedule,
+                 degree):
         super().__init__(name, address)
         self.specialities = specialities
         self.schedule = schedule
+        self.__degree = degree
 
-    def diagnose_patient(self, patient):
+    def __diagnose_patient(self, patient):
         print(F'diagnosed patient {patient.name} by doctor {self.name}')
 
 
@@ -42,5 +44,8 @@ class Patient(User):
 patient = Patient('Jhon', 'KTM', 'Cough')
 patient.get_appointment()
 
-doctor = Doctor('Dr. Bob', 'KTM', 'OPD', 'SUN: 7-8')
-doctor.diagnose_patient(patient)
+doctor = Doctor('Dr. Bob', 'KTM', 'OPD', 'SUN: 7-8', 'MBBS')
+# doctor.diagnose_patient(patient)
+print(dir(Doctor))
+
+doctor.login()
