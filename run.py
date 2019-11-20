@@ -1,8 +1,26 @@
 from flask import Flask
 from flask_restful import Api, Resource, request
+from flask_sqlalchemy import SQLAlchemy
+import uuid
 
 app = Flask(__name__)
 api = Api(app, prefix='/v1')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://snc:csit@localhost/csit-snc'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy()
+db.init_app(app)
+
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+
+class User(db.Model):
+    id = db.Column(db.String(), primary_key=True)
+    username = db.Column(db.String())
+    password = db.Column(db.String())
 
 
 class HelloWorldResource(Resource):
@@ -11,53 +29,60 @@ class HelloWorldResource(Resource):
         return 'Congratulations you have successfully built first api in flask'
 
 
-users = [{
-    'name': 'Bob',
-    'address': 'USA',
-    'profession': 'software engineer'
-},
-    {
-        'name': 'Jhon',
-        'address': 'Australia',
-        'profession': 'Architect'
-    },
-    {
-        'name': 'Martin',
-        'address': 'Canada',
-        'profession': 'Singer'
-    }
-]
-
-
 class UserResource(Resource):
     @classmethod
     def get(cls):
-        return users
+        db_users = User.query.all()
+        response = []
+        for db_user in db_users:
+            user = {
+                'id': db_user.id,
+                'username': db_user.username,
+                'password': db_user.password
+            }
+            response.append(user)
+        return response
 
     @classmethod
     def post(cls):
-        user = request.get_json()
-        users.append(user)
-        return user
+        data = request.get_json()
+
+        user = User()
+        user.id = str(uuid.uuid4())
+
+        user.username = data['username']
+        user.password = data['password']
+
+        db.session.add(user)
+        db.session.commit()
+        return {
+            'id': user.id,
+            'username': user.username,
+            'password': user.password
+        }
 
     @classmethod
     def put(cls):
         data = request.get_json()
-        name = data['name']
-        for user in users:
-            if user['name'] == name:
-                users.remove(user)
-                users.append(data)
-        return data
+        user_id = data['id']
+        user = User.query.filter(User.id == user_id).first()
+        if user:
+            user.username = data['username']
+            user.password = data['password']
+            db.session.commit()
+        return {
+            'id': user.id,
+            'name': user.username,
+            'password': user.password
+        }
 
     @classmethod
     def delete(cls):
-        name = request.get_json()['name']
-        for user in users:
-            if user['name'] == name:
-                users.remove(user)
-                return {}, 204
-        return {"message": F"User with {name} doesnt exit"}, 400
+        user_id = request.get_json()['id']
+        user = User.query.filter(User.id == user_id).first()
+        db.session.delete(user)
+        db.session.commit()
+        return {}, 204
 
 
 api.add_resource(UserResource, '/users')
