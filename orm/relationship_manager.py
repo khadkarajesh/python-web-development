@@ -58,3 +58,9 @@ def get_employees():
     employees = Employee.query.all()
     for employee in employees:
         print(employee)
+
+
+def get_educations():
+    educations = Education.query.all()
+    for education in educations:
+        print(education.employee.name)

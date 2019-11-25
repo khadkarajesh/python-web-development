@@ -1,13 +1,14 @@
 from flask import request
 from flask_restful import Resource
 
-from orm.relationship_manager import create_user, add_education, get_employees
+from orm.relationship_manager import create_user, add_education, get_employees, get_educations
 
 
 class OneToManyResource(Resource):
 
     @classmethod
     def get(cls):
+        get_educations()
         return get_employees()
 
     @classmethod
