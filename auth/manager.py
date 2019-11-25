@@ -1,4 +1,5 @@
 import bcrypt
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 from extensions import db
 from auth.models.user import User
@@ -39,8 +40,17 @@ def login(email, password):
         return {'message': 'invalid username/password'}, 401
 
     if user.email == email and match_password(password, user.password):
+        access_token, refresh_token = generate_token(user.email)
         return {
             'id': user.id,
-            'email': user.email
+            'email': user.email,
+            'access_token': access_token,
+            'refresh_token': refresh_token
         }
     return {'message': 'invalid username/password'}, 401
+
+
+def generate_token(identity):
+    access_token = create_access_token(identity=identity)
+    refresh_token = create_refresh_token(identity=identity)
+    return access_token, refresh_token
