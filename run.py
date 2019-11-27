@@ -1,7 +1,10 @@
 from flask import Flask
 from flask_restful import Api
-from extensions import db
 
+from company.resources.company_resource import CompanyResource
+from education.resources.education_resource import EducationResource
+from employee.resources.employee_resource import EmployeeResource
+from extensions import db
 
 from auth.resources.login_resource import LoginResource
 from auth.resources.signup_resource import SignupResource
@@ -21,6 +24,9 @@ def create_tables():
 api.add_resource(SignupResource, '/auth/signup')
 api.add_resource(LoginResource, '/auth/login')
 api.add_resource(OneToManyResource, '/one-to-many')
+api.add_resource(CompanyResource, '/employees/<employee_id>/companies')
+api.add_resource(EmployeeResource, '/employees')
+api.add_resource(EducationResource, '/employees/<employee_id>/educations')
 
 if __name__ == '__main__':
     db.init_app(app)

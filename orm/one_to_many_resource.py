@@ -1,7 +1,7 @@
 from flask import request
 from flask_restful import Resource
 
-from orm.relationship_manager import create_user, add_education, get_employees, get_educations
+from orm.relationship_manager import create_employee, add_education, get_employees, get_educations
 
 
 class OneToManyResource(Resource):
@@ -13,8 +13,10 @@ class OneToManyResource(Resource):
 
     @classmethod
     def post(cls):
-        user = create_user()
+        data = request.get_json()
+        user = create_employee(data)
         educations = []
+        companies = []
         for education in user.educations:
             data = {
                 'field_of_study': education.field_of_study,
@@ -22,10 +24,17 @@ class OneToManyResource(Resource):
                 'degree': education.degree
             }
             educations.append(data)
+
+        for company in user.companies:
+            data = {
+                'name': company.name,
+                'location': company.location
+            }
+            companies.append(data)
         return {
             'name': user.name,
-            'educations': educations
-
+            'educations': educations,
+            'companies': companies
         }
 
     @classmethod

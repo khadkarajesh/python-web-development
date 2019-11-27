@@ -1,19 +1,40 @@
-from orm.one_to_many import Employee, Education
+from company.models.company import Company
+from education.models.education import Education
+from employee.models.employee import Employee
 from extensions import db
 import datetime
 
 
-def create_user():
-    employee = Employee('Bob Marley', '100', 'M', '24234')
-    education = Education('Music',
-                          'Bachelor Degree',
-                          datetime.date.today(),
-                          datetime.date.today(),
-                          'Institute of Music',
-                          'A',
-                          'description')
+def create_employee(data):
+    name = data['name']
+    age = data['age']
+    gender = data['gender']
+    phone = data['phone']
 
-    employee.educations.append(education)
+    # degree = data['education']['degree']
+    # field_of_study = data['education']['field_of_study']
+    # start_date = data['education']['start_date']
+    # end_date = data['education']['end_date']
+    # institution = data['education']['institution']
+    # grade = data['education']['grade']
+    # description = data['education']['description']
+    #
+    # company_name = data['company']['name']
+    # company_location = data['company']['location']
+    #
+    employee = Employee(name, age, gender, phone)
+    # education = Education(degree,
+    #                       field_of_study,
+    #                       start_date,
+    #                       end_date,
+    #                       institution,
+    #                       grade,
+    #                       description)
+    #
+    # employee.educations.append(education)
+    #
+    # company = Company(company_name, company_location)
+    # employee.companies.append(company)
 
     db.session.add(employee)
     db.session.commit()
