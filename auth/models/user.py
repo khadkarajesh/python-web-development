@@ -7,6 +7,20 @@ class User(db.Model):
     email = db.Column(db.String(), nullable=False)
     password = db.Column(db.String(), nullable=False)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'profile': {
+                'name': self.profile.name,
+                'phone': self.profile.phone,
+                'address': self.profile.address
+            }
+        }
+
     @classmethod
     def find_user_by(cls, email):
         return User.query.filter(User.email == email).first()
+
+    @classmethod
+    def find_user_by_id(cls, user_id):
+        return User.query.filter(User.id == user_id).first()

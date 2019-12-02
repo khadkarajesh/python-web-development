@@ -1,5 +1,7 @@
 from flask import Flask
 from flask_restful import Api
+
+from auth.resources.user_profile_resource import UserProfile
 from extensions import db, jwt
 
 from auth.resources.login_resource import LoginResource
@@ -19,6 +21,7 @@ def create_tables():
 
 api.add_resource(SignupResource, '/auth/signup')
 api.add_resource(LoginResource, '/auth/login')
+api.add_resource(UserProfile, '/users/<user_id>/me')
 
 if __name__ == '__main__':
     db.init_app(app)

@@ -1,6 +1,7 @@
 import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
 
+from auth import Profile
 from extensions import db
 from auth.models.user import User
 
@@ -54,3 +55,11 @@ def generate_token(identity):
     access_token = create_access_token(identity=identity)
     refresh_token = create_refresh_token(identity=identity)
     return access_token, refresh_token
+
+
+def add_user_profile(user_id, data):
+    user = User.find_user_by_id(user_id)
+    profile = Profile(data['name'], data['phone'], data['address'])
+    user.profile = profile
+    db.session.commit()
+    return user.to_dict()
